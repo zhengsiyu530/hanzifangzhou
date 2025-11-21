@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>甲骨文学习平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "SimHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f2e9;
+            color: #5c3d1e;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid #c9a87a;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #8b4513;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a67c52;
+            font-style: italic;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #c9a87a;
+        }
+        
+        .tab-btn {
+            padding: 12px 30px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #a67c52;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #8b4513;
+            border-bottom: 3px solid #8b4513;
+            font-weight: bold;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .search-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .search-box {
+            padding: 10px 15px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #c9a87a;
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            background-color: #f9f5eb;
+        }
+        
+        .stories-grid, .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .story-card, .character-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 1px solid #e8d9c3;
+        }
+        
+        .story-card:hover, .character-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .story-image, .character-image {
+            width: 100%;
+            height: 200px;
+            background-color: #f9f5eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #8b4513;
+            border-bottom: 1px solid #e8d9c3;
+            overflow: hidden;
+        }
+        
+        /* 添加图片样式 */
+        .story-img, .character-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .story-content, .character-content {
+            padding: 20px;
+        }
+        
+        .story-title, .character-title {
+            font-size: 1.5rem;
+            color: #8b4513;
+            margin-bottom: 10px;
+        }
+        
+        .story-description, .character-description {
+            color: #5c3d1e;
+            font-size: 0.95rem;
+        }
+        
+        /* 视频模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #8b4513;
+            cursor: pointer;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            height: 0;
+            margin-top: 20px;
+        }
+        
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0;
+            color: #a67c52;
+            border-top: 1px solid #c9a87a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>甲骨文学习平台</h1>
+            <p class="subtitle">探索汉字起源，品味千年智慧</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="idioms">甲骨文成语</button>
+            <button class="tab-btn" data-tab="characters">甲骨文字</button>
+        </div>
+        
+        <div class="page active" id="idioms-page">
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="搜索成语...">
+            </div>
+            
+            <div class="stories-grid">
+                <div class="story-card" data-video="image/huashetianzu.mp4"> <!-- 修改视频路径 -->
+                    <div class="story-image">
+                        <img src="./image/huashetianzu.jpg" alt="画蛇添足" class="story-img">
+                    </div>
+                    <div class="story-content">
+                        <h3 class="story-title"><i class="fas fa-book"></i>画蛇添足</h3>
+                        <p class="story-description">原意为画蛇时给蛇添上脚，后比喻做了多余的事，非但无益，反而不合适。</p>
+                    </div>
+                </div>
+                
+                <div class="story-card" data-video="image/shouzhudaiti.mp4"> <!-- 修改视频路径 -->
+                    <div class="story-image">
+                        <img src="image/shouzhudaiti.jpg" alt="守株待兔" class="story-img">
+                    </div>
+                    <div class="story-content">
+                        <h3 class="story-title"><i class="fas fa-book"></i>守株待兔</h3>
+                        <p class="story-description">比喻死守经验，不知变通，亦用以讽刺妄想不劳而获的侥幸心理。</p>
+                    </div>
+                </div>
+                
+                <div class="story-card" data-video="image/kezhouqiujian.mp4"> <!-- 修改视频路径 -->
+                    <div class="story-image">
+                        <img src="image/kezhouqiujian.jpg" alt="刻舟求剑" class="story-img">
+                    </div>
+                    <div class="story-content">
+                        <h3 class="story-title"><i class="fas fa-book"></i>刻舟求剑</h3>
+                        <p class="story-description">比喻人的眼光未与客观世界的发展变化同步，不懂得根据实际情况处理问题。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page" id="characters-page">
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="搜索文字...">
+            </div>
+            
+            <div class="characters-grid">
+                <div class="character-card">
+                    <div class="character-image">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <div class="character-content">
+                        <h3 class="character-title">日</h3>
+                        <p class="character-description">甲骨文中的'日'字，象形字，形状像太阳。</p>
+                    </div>
+                </div>
+                
+                <div class="character-card">
+                    <div class="character-image">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <div class="character-content">
+                        <h3 class="character-title">月</h3>
+                        <p class="character-description">甲骨文中的'月'字，象形字，形状像弯月。</p>
+                    </div>
+                </div>
+                
+                <div class="character-card">
+                    <div class="character-image">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <div class="character-content">
+                        <h3 class="character-title">水</h3>
+                        <p class="character-description">甲骨文中的'水'字，象形字，形状像流动的水。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 甲骨文学习平台 | 传承中华文化</p>
+        </footer>
+    </div>
+
+    <!-- 视频模态框 -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2 id="modalTitle">成语标题</h2>
+            <p id="modalDescription">成语简介</p>
+            <div class="video-container">
+                <video id="videoPlayer" controls>
+                    您的浏览器不支持 HTML5 video 标签。
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 标签切换功能
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const pages = document.querySelectorAll('.page');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                
+                // 更新活动标签
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // 显示对应页面
+                pages.forEach(page => page.classList.remove('active'));
+                document.getElementById(`${tabId}-page`).classList.add('active');
+            });
+        });
+
+        // ========== 视频播放功能 ==========
+        
+        // 获取模态框元素
+        const videoModal = document.getElementById('videoModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const videoPlayer = document.getElementById('videoPlayer');
+        
+        // 为所有故事卡片添加点击事件
+        document.querySelectorAll('.story-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 获取卡片中的标题和描述
+                const title = this.querySelector('.story-title').textContent;
+                const description = this.querySelector('.story-description').textContent;
+                const videoUrl = this.getAttribute('data-video'); // 获取视频路径
+                
+                // 设置模态框内容
+                modalTitle.textContent = title;
+                modalDescription.textContent = description;
+                
+                // 设置视频源
+                videoPlayer.innerHTML = `<source src="${videoUrl}" type="video/mp4">`;
+                videoPlayer.load();
+                
+                // 显示模态框
+                videoModal.style.display = 'flex';
+            });
+        });
+        
+        // 关闭模态框
+        closeModal.addEventListener('click', function() {
+            videoModal.style.display = 'none';
+            videoPlayer.pause(); // 暂停视频
+            videoPlayer.currentTime = 0; // 重置播放位置
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            if (event.target === videoModal) {
+                videoModal.style.display = 'none';
+                videoPlayer.pause();
+                videoPlayer.currentTime = 0;
+            }
+        });
+    </script>
+</body>
+</html>
